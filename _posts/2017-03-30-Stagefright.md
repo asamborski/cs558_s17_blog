@@ -28,19 +28,25 @@ The attack vector he chose to exploit in this specific attack was the MMS vector
 Now that the malicious MMS received, the attack began to attack the media server and eventually escalate privileges. 
 
 The second issue is that libstagefright was suffering from overflow issues. This is what allowed an attacker to execute malicious code in a media file. There existed many exploitable overflows across various attack vectors, but specifically for MPEG4 files, Drake found this snippet of code that contained an integer overflow vulnerable function “parseChunk(offset, depth + 1)” [7]. Issues arising from this overflow are elaborated on in the next section.
-![alt text](https://github.com/ksparakis/Stagefright-Explained/raw/master/4.png "Title")
+<img src="https://github.com/ksparakis/Stagefright-Explained/raw/master/4.png ">
+
 								
 ### How Does the Buffer Overflow Work?				        
 
 Buffer overflows are an entire family of attacks. Although Android is primarily written in Java, certain parts of it, such as the media library, are written in C++ for speed and other reasons. The improper use of memory pointers is what allows for these stack overflow vulnerabilities which was the basis for the Stagefright attack. 
 
 The integer overflows, pointed out in detail earlier with references to CVE’s, are a sort of heap overflow attack. 
-![alt text](https://github.com/ksparakis/Stagefright-Explained/raw/master/1.png "Title")
+<br>
+<img src="https://github.com/ksparakis/Stagefright-Explained/raw/master/1.png" width="250">
+<br>
 For the sake of this specific we will concentrate on the Heap and Stack.
 In the diagram below on the left, we see that in the Stack we have a pointer, that points to the memory location of our variable text, which is located in the heap. Let's say text = “AAAAAABBBBBCCCCCDDDDD”. The  memory location for text  is at *Var text=“0x29ff1c”.Var command, points to “0x29ff18” in this example.
+<br>
         [11.]
-	![alt text](https://github.com/ksparakis/Stagefright-Explained/raw/master/3.png "Title")
-	![alt text](https://github.com/ksparakis/Stagefright-Explained/raw/master/2.png "Title")
+	<br>
+	<img src="https://github.com/ksparakis/Stagefright-Explained/raw/master/3.png" width="350">
+	<img src="https://github.com/ksparakis/Stagefright-Explained/raw/master/2.png" width="350">
+	<br>
 This attack works when the actual size of text, exceeds the allocated size of text. Then it keeps writing over whatever is next. So what the attacker does is send in a variable text = “AAAAAABBBBBCCCCCDDDDD” + Malicious(){does something bad;}. There is still one issue here: the malicious function needs to override perfectly where the function command() is in the memory.. But to an attacker's advantage there exists a CPU instruction called a “nop”. The CPU will skip over this until it reaches it’s next valid instruction. So an attacker adds this in between the text and their malicious code, in something called a Nop Slide: text = “AAAAAABBBBBCCCCCDDDDD” + “nop/nop/nop/nop….” + “Malicious(){does something bad;}”. So as long as one of the nops is positioned properly, when the process thinks it is calling command(), if it hits a nop it will keep executing nop which is nothing until it reaches the instructions of Malicious(), executing the malicious code. Enter the intro into Drake’s Stagefright attack.
 
 Given that most modern heaps have meta data and other architectures would complicate such an attack, this explanation is generally oversimplified, yet buffer overflow is the premise of the Stagefright attack. The media file containing the malicious, corrupt code executes this type flavor of attack.
