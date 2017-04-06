@@ -33,9 +33,12 @@ The second issue is that libstagefright was suffering from overflow issues. This
 								
 ### How Does the Buffer Overflow Work?				        
 
-Buffer overflows are an entire family of attacks. Although Android is primarily written in Java, certain parts of it, such as the media library, are written in C++ for speed and other reasons. The improper use of memory pointers is what allows for these stack overflow vulnerabilities which was the basis for the Stagefright attack. 
+Buffer overflows are an entire family of attacks. Although Android is primarily written in Java, certain parts of it, such as the media library, are written in C++ for speed and other reasons. The improper use of memory pointers is what allows for these stack overflow vulnerabilities which was the basis for the Stagefright attack. The integer overflows, pointed out in detail earlier with references to CVE’s, are a sort of heap overflow attack. 
 
-The integer overflows, pointed out in detail earlier with references to CVE’s, are a sort of heap overflow attack. 
+Every computer process has memory allocated to it in a specific fashion. as pointed out by [12.]. This memory space will always range from memory address x->y. All variables, computer instructions and things related to this program will be located within this memory space. For the sake of this specific we will concentrate on the Heap and Stack and ignore static variable and program instructions.
+
+<br>
+[12.]
 <br>
 <img src="https://github.com/ksparakis/Stagefright-Explained/raw/master/1.png" width="250">
 <br>
