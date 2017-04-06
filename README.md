@@ -12,9 +12,8 @@ This can easily be done from the browser by going to the [_posts](_posts/) folde
 
 	```
 	---
-	layout: notes
+	layout: post
 	title: Pegasus Spyware
-	date: 04-04-2017
 	author: Your Names
 	---
 
