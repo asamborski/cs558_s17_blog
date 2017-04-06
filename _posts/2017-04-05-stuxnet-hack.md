@@ -1,0 +1,81 @@
+---
+layout: notes
+title: Stuxnet
+date: 04-05-2017
+author: Catalina Damarati, Andrew Lee, Nicolas Hinderling
+---
+
+# Stuxnet
+ 
+## Abstract
+------
+Stuxnet, originally known as Operation Olympic Games, was the world’s first cyber weapon. It was a computer worm that infected a secret nuclear facility in Iran to inhibit its progress. Motivated by political incentives, this secretive software broke through the virtual world into the physical word and wreaked physical havoc inside the nuclear facility in Natanz. The worm focused on affected Iranian gas centrifuges which were used for creating nuclear power. This covert operation started in 2006 is still unacknowledged by the United States and any potential participants.
+
+## Pres/News
+------
+Because of the secrecy surrounding this worm, information on the worm as the attack was being carried out was nonexistent. Even when the worm itself was discovered in the Iranian systems, they had no idea what it was doing. Consequently, the press and media surrounding the attack upon its discovery in June 2010 do not have much substance. They could only wildly speculate using “nuclear”, “Iran” and “Israel” as buzzwords. Only months later was there any real information on the worm. Because of the political aspect of this attack, the information centered mostly on just that. Specific technical information was scant. Only in media coverage from recent years has real technical information been available which usually cite a book Countdown to Zero Day by Kim Zetter that goes in depth with the technical aspects of the attack. There also was a documentary called Zero Days released in 2016 with technical and political details of the attack.
+
+## Timeline of the Attack
+------
+Iran’s nuclear program was launched with the help of the United States in the 1950’s as a part of the Atoms for Peace program. Amicable relations existed between the United States, Western European governments and Iran until the Iranian Revolution in 1979. At that point, international nuclear support for Iran’s program was cut off. Iran continued its nuclear program alone. Under president of Iran Mahmoud Ahmadinejad, Iran began to aggressively expand its nuclear program in the 2000’s. 
+
+In January 2008, the Israeli government, worried by the growing size of Iran’s nuclear program, requested permission from their ally, the U.S, to bomb the nuclear facilities. The U.S. denied permission as to avoid military conflict with Iran as they were already at war with Iraq at the time. Meanwhile, by April 2008, Iran had built 6000 centrifuges as Israeli tensions rose. In reaction to the delicate situation forming, the Bush administration started Operation Olympic Games which would be later known as Stuxnet and was actually accelerated under the Obama administration. This was to be the world’s first cyber weapon and was a joint effort among three parties: the CIA, the Mossad (the Israeli version of the CIA) and unnamed contracted entities. Operation Olympic Games was a mean to two ends. First, this operation with the inclusion of the Mossad appeased the Israeli government. With this operation in action, they agreed to not bomb the Iranian facilities and cooperate in this more peaceful solution. Second, this operation inhibited the Iranian nuclear program. It is speculated that this operation set the Iranian nuclear program back about two years.
+
+In June and July 2009, the effects of the two Stuxnet attacks began to take effect in a secret nuclear facility in Natanz.
+
+In the months to come, more secret nuclear facilities would be discovered throughout Iran. In September 2009, the Obama administration gives Iran an ultimatum: Stop all nuclear programs under threat of potential military action. This was in response to recently photos of the facilities. The size and configuration of the facilities were not consistent with nuclear power plant research. The facilities were clearly being constructed for nuclear weapons. Iran ignored Obama’s ultimatum and continued with their nuclear program. 
+
+In November 2009, official reports from the IAEA (International Atomic Energy Agency) indicate that the Iranian nuclear facilities were experiencing issues. Although Iran was still installing centrifuges in Natanz, they were experiencing operational malfunctions. And in December 2009, it was discovered that 1000-2000 centrifuges were decommissioned in the Natanz facility.
+
+In June 2010, the Stuxnet worm was discovered. A security software company VirusBlokAda discovered a machine in Natanz stuck in a reboot loop. Upon further inspection, they discovered the bug causing the reboot loop was exploiting a zero day vulnerability in Windows Explorer. It is important to note that at this point, they still did not know that the bug was affecting the centrifuges in the facilities. They only knew that there was a bug that exploited a zero day vulnerability. 
+
+## Technical
+------
+
+### What is a centrifuge?
+A centrifuge is a piece of technical equipment that uses centripetal force to separate substances and particles from each other. They are common in laboratory settings and there are many types of centrifuges. The most relevant one is the gas centrifuge. A gas centrifuge can be used to separate Uranium-235 from Uranium-238. Uranium-235 is used for nuclear power or weapons.
+
+### How they got in
+Stuxnet was originally introduced into Natanz’s system via USB. This of course means that the CIA and Mossad either had a man on the inside or they did something clever to get an unknowing engineer to insert an infected usb into the system. When we gave our presentation, one student actually mentioned a theory he had heard where agents dropped free USBs off at all internet cafes surrounding the area and that in theory, one of the Natanz engineers could have taken one and used it thinking it was uncompromised.
+
+That being said, Ralph Langner made it very clear in his research that the attack implemented by Stuxnet could have just as easily been conceived with worm technology rather than requiring physical access. We actually saw this 2-3 years later in the Kaspersky attack (the perpetrators used two of the same zero day vulnerabilities used by Stuxnet, and got into the system with their worm).
+
+### How they broke the centrifuges
+Stuxnet’s objective was clear: the software wanted to sabotage the centrifuges primarily by breaking the rotors. In order to do this, it implemented two concurrent attacks. The first was much more stealthy and went as follows: The code would slowly increase the pressure inside the centrifuges. Centrifuges can’t properly operate unless they are at a specific pressure so the centrifuge rotors would attempt to combat the difference. This would put a subtle but significant strain on these rotors. Stuxnet would block the drive system (CDS) and feed it pre-recorded data in order to avoid suspicion. Something to note is that this attack is incredibly complex and required a deep knowledge of not only nuclear power but also Natanz’s specific nuclear power plant configuration. Plus, it’s pretty incredible that Stuxnet had perfect pre recorded data to feed the system. There are rumors that Mossad built an identical power plant in Israel in an attempt to craft the attack.
+
+The second attack was much more rogue and aggressive. This approach involved directly modifying the rotor speeds. Once a month, Stuxnet would increase the rotor speed by a third for about a half hour and then drop the speed down to zero and keep it there for about 15 minutes. This process was incredibly taxing since in theory, the rotors should tend to remain at a consistent RPM. This was considered so rogue because it involved directly blocking the Centrifuge Protection System (CPS) and again feeding fake data. Not only could an engineer have noticed this strange behavior and debugged the system to see that sensor data wasn’t actually being read, but also if anything were to have happened in the plant that required a digital safety mechanism, the CPS wouldn’t have been available and catastrophic things could have happened!
+
+The blocking of the two centrifuge systems is a really big deal because despite being pretty dangerous, this kind of approach paired with the zero day infiltration proves to be a very replicable attack. Langner spoke of this in his TED talk, and stressed that this could easily be used to sabotage other similar settings such as car manufacturing plants, the electric grid, etc.
+
+## How Could it Have Been Prevented?
+------
+The Stuxnet attack would have been nearly impossible to prevent. Since the virus was introduced via USB drive, someone on the inside had to have done it. Therefore, the Iranian facility would have had to have complete loyalty from all of their workers to prevent Stuxnet from being directly introduced into the system. They also could have noticed the protection system was being blocked for 30 minutes once a month and debugged during those times. However, due to its infrequency and short span of time, these malfunctions mostly went unnoticed and ignored. 
+
+## Incentives and Consequences
+------
+The US and Israel felt threatened by the Iranian efforts at enriching uranium because they believed that eventually this would lead to the production of nuclear weapons in Iran. Israel initially wanted to attack Iran to stop their efforts, however the US wanted to avoid another full-fledged war due to already being in a war with Iraq. Therefore, the Bush Administration initiated Stuxnet as a more “peaceful” alternative which kept Israel from launching a military attack on Iran and was able to set back the Iranian nuclear program at Natanz by a few year. However, despite these “accomplishments”, Stuxnet was Pandora’s Box and many question whether it was worth it. When Stuxnet was introduced, it became the world’s first cyber weapon and was the catalyst in a new kind of warfare, Cyber Wars. Enemies now had something they could analyze, learn from, reverse engineer, and eventually use to introduce new threats in the cyber world. 
+
+## Interested in More Details?
+------
+We recommend checking out the following resources:
+* Kim Zetter’s novel Countdown to Zero Day
+* Ralph Langner’s TED talk
+* “Zero Days” (2016) the movie
+
+## References
+------
+Press:
+* http://www.nytimes.com/2011/01/16/world/middleeast/16stuxnet.html?pagewanted=1&_r=1
+* http://www.cbsnews.com/news/iran-confirms-stuxnet-worm-halted-centrifuges/
+* https://www.rt.com/news/snowden-nsa-interview-surveillance-831/
+* http://www.bbc.com/news/technology-11388018
+* http://www.telegraph.co.uk/news/worldnews/europe/russia/8262853/Stuxnet-virus-attack-Russia-warns-of-Iranian-Chernobyl.html
+* https://en.wikipedia.org/wiki/Operation_Olympic_Games
+* https://arstechnica.com/tech-policy/2012/06/confirmed-us-israel-created-stuxnet-lost-control-of-it/
+* http://www.businessinsider.com/zero-days-stuxnet-cyber-weapon-2016-7
+* https://www.wired.com/2013/03/stuxnet-act-of-force/ 
+
+Technical Research:
+* http://www.langner.com/en/wp-content/uploads/2013/11/To-kill-a-centrifuge.pdf
+* http://www.zdnet.com/article/stuxnet-attackers-used-4-wind
+
