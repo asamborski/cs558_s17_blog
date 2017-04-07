@@ -7,7 +7,7 @@ author: Sarah Larbi, Victoria Thompson, Konstantino Sparakis, and Megan Horan
 
 # StageFright Attack
 By Sarah Larbi, Victoria Thompson, Konstantino Sparakis, and Megan Horan
-
+This la
 ## Abstract
 Stagefright was a hack initially discovered and reported to Google by a security researcher, Joshua Drake, in April 2015. News of the attack surfaced in the mainstream media later that summer, describing it as “the worst android hack ever,” [3] affecting nearly 950 million devices.  Headlines ominously depicted the attack, implying that no Android was safe. Stagefright was a vulnerability found within the Android media server library.  It existed in several versions of Android’s operating system and allowed an attacker to execute remote code on a user’s device, potentially without detection. In our report, we detail what the Stagefright vulnerability was, as well as demonstrate how Joshua Drake was able to exploit it. 
 
@@ -42,8 +42,10 @@ Every computer process has memory allocated to it in a specific fashion. as poin
 <br>
 <img src="https://github.com/ksparakis/Stagefright-Explained/raw/master/1.png" width="250">
 <br>
+<br>
 For the sake of this specific we will concentrate on the Heap and Stack.
 In the diagram below on the left, we see that in the Stack we have a pointer, that points to the memory location of our variable text, which is located in the heap. Let's say text = “AAAAAABBBBBCCCCCDDDDD”. The  memory location for text  is at *Var text=“0x29ff1c”.Var command, points to “0x29ff18” in this example.
+<br>
 <br>
         [11.]
 	<br>
@@ -78,8 +80,9 @@ Further research has also shown that there are ways to bypass ASLR in Android du
 Fortunately, there is no evidence of this attack ever being implemented in the wild. Joshua Drake attributes his motivation for researching this particular vulnerability to a variety of reasonings. At Black Hat USA 2015, he describes his primary motivation for the project to be his interest in “improving overall mobile security”[4]. 
 
 The stagefright library was specifically interesting for several reasons. Prior to the discovery of the Stagefright bug set, there had been multiple public mentions of instability/crashes [3]. Many users were reporting battery death, phone reboots, and a slew of other errors. Intel fuzz tested the media library on these Android devices and discovered nearly 12 terabytes of crashes within the server[3]. All of this pointed back to ‘corrupt media files’ which led to Joshua Drake looking further into the media server library to find what was going wrong. The mode of attack that Drake used in his research was through the MPEG4 vector, which was most frightening due to it’s use of undetectable remote code execution on the user’s device. Even further, he found that there were more than 11 attack vectors discovered overall, not all necessarily undetectable, but exploitable nonetheless. 
-
-
+<br>
+<br>
+**This work was done without any outside collaboration.**
 
 
 
