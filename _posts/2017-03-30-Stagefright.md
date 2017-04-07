@@ -1,12 +1,12 @@
 ---
 layout: post
 title: Stagefright
-author: Sarah Larbi, Victoria Thompson, Konstantino Sparakis, and Megan Horan
+author: Sarah Larbi, Victoria Thomson, Konstantino Sparakis, and Megan Horan
 ---
 
 
 # StageFright Attack
-By Sarah Larbi, Victoria Thompson, Konstantino Sparakis, and Megan Horan
+By Sarah Larbi, Victoria Thomson, Konstantino Sparakis, and Megan Horan
 This la
 ## Abstract
 Stagefright was a hack initially discovered and reported to Google by a security researcher, Joshua Drake, in April 2015. News of the attack surfaced in the mainstream media later that summer, describing it as “the worst android hack ever,” [3] affecting nearly 950 million devices.  Headlines ominously depicted the attack, implying that no Android was safe. Stagefright was a vulnerability found within the Android media server library.  It existed in several versions of Android’s operating system and allowed an attacker to execute remote code on a user’s device, potentially without detection. In our report, we detail what the Stagefright vulnerability was, as well as demonstrate how Joshua Drake was able to exploit it. 
