@@ -11,6 +11,7 @@ Cloudflare is a company that provides a CDN, DNS, and security services for cust
 ## Discovery, Incentives, and Involved Parties
 
 ## Media Coverage
+Cloudflare was able to stop the bug before any major leaks occurred. However, the media blew the dangers of the leaks out of proportion. A journalist from spamfighter even stated that “For, Cloudbleed' name of one fresh security bug possibly hacked user-data from websites that utilize the security facility 'Cloudflare”, claiming that the bug was a hack but it was actually a leak.  Thomas Fox-Brewster from Forbes stated that ““A large company like Uber might receive somewhere between 10 billion and 50 billion requests a month and so could have leaked somewhere between 1,000 and 6,000 times,” which over exaggerate the leaks because the reported number of request can not be determined just by how many request is made by Cloudflare. The title of this article “How bad was Cloudbleed?1.2 Million Leaks Bad”, as again an over exaggeration of the useable sensitive data that was leaked. 
 
 ## The Bug
 
