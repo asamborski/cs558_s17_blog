@@ -21,7 +21,7 @@ That is how the bug works, but how did look on the browser? This is an example o
 Here is an example of Uber data that you could search for using google. You only need to search with the Cloudflare header followed by the company name. Here we can see the potential data leaks from uber including a specific user’s cookie, exact geolocation and the uber auth token.
 
 ![img-name](../img/googlesearch.png)
-![img-name](../img/uberdata.png)
+![img-name](../img/UberData.png)
 
 The Search Results where quickly scrubbed by Google, Duck Duck Go and other major search engines after the initial discovery. This was done to prevent exposure to sensitive information.
 
