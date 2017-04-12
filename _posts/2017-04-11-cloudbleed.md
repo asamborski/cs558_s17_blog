@@ -41,6 +41,8 @@ Here, the input HTML is matched against the regular expression `((unquoted_attr_
 
 Given an unbalanced script tag like the HTML example above, the `$lerr{}` block would be executed since the regular expression matches well-formed tags. This is where we run into trouble. In this code block we `fgoto script_consume_attr` which will execute this same state machine to try to parse the next attribute. The problem with this is that with HTML malformed like the one above, there *is* no next attribute. Instead, the parser finds raw server memory and that gets injected into the response HTML instead.
 
+It's also important to note the `fhold` in the `@{}` block. This keeps the parser looking at the same part of the input (rather than skipping ahead). If there were an `fhold` in the `$lerr{}` block, the memory leak would have been avoided.
+
 The bug becomes much clearer when we look at some of the C code that this Ragel generates:
 ```c
 /* generated code */
@@ -76,15 +78,13 @@ How could this bug and leak have been prevented? What can we learn from this ord
 
 * Tagged Memory - while modern web security has come a long way, there's an argument to be made that we are ultimately putting band aids on legacy systems that weren't designed to be secure. Companies could invest more in making underlying technologies more secure. In the case of Cloudbleed, perhaps a tagged memory architecture that restricts access to server memory more robustly could have mitigated the buffer overrun and consequently, the leak.
 
-* Evaluate legacy code thoroughly **AUSTIN**
+* More rigorous testing of legacy code may have helped prevent Cloudbleed. The code for the HTML parser seems to have originated from Brian Pane's open source [Jitify](https://github.com/brianpane/jitify-core) (see the copyright info below) which we found while researching parsers written in Ragel. <img style=" margin: 1em; border-radius: 2px; border: 1px solid #CCC;" src="/img/copyright_jitify.png"> <img style=" margin: 1em; border-radius: 2px; border: 1px solid #CCC;" src="/img/JFP.png"> This means the code base for the parser is over 7 years old. Rigorous code review of older code may have helped prevent Cloudflare from triggering this bug while moving away from the Ragel parser to their new one.
 
 ### Cloudflare was the Single point of Failure
 So what happened to all the modern security standards we learned in class and why didn’t they prevent or mitigate this bug? TLS/SSL wasn't compromised or misused, authentication methods were behaving properly; why didn't these help? The bug was caused by poorly written code on Cloudflare’s server itself, and this code resulted in data being leaked into HTML pages. So the pages were encrypted and authorized as usual, but contained data that wasn't supposed to be there. This, combined with search engine caches making the data more accessible, made security frameworks in place irrelevant.
 
-## Legal and Ethical Issues
-
 ## Acknowledgment
-Thanks to Professor Goldberg and Ann Ming Samborski for all the feedbacks.
+Thanks to Professor Sharon Goldberg and Ann Ming Samborski for all the feedback.
 
 
 ## References
