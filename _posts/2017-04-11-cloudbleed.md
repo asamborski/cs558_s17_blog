@@ -70,8 +70,8 @@ The problem was made worse by the fact that search engines had cached these page
 
 Here is an example of Uber data that you could search for using google. You only need to search with the Cloudflare header followed by the company name.
 
-![img-name](/img/googlesearch.png)
-![img-name](/img/UberData.png)
+![img-name](https://raw.githubusercontent.com/asamborski/cs558_s17_blog/master/img/googlesearch.png)
+![img-name](https://raw.githubusercontent.com/asamborski/cs558_s17_blog/master/img/UberData.png)
 
 In the image above we can see the potential data leaks from Uber including a specific user’s cookie, geolocation, and an auth token. The Uber auth token and cookie are particurlary sensitive because they could potentially be used to highjack a user's session.
 
@@ -85,7 +85,7 @@ How could this bug and leak have been prevented? What can we learn from this ord
 
 * Tagged Memory - while modern web security has come a long way, there's an argument to be made that we are ultimately putting band aids on legacy systems that weren't designed to be secure. Companies could invest more in making underlying technologies more secure. In the case of Cloudbleed, perhaps a tagged memory architecture that restricts access to server memory more robustly could have mitigated the buffer overrun and consequently, the leak.
 
-* More rigorous testing of legacy code may have helped prevent Cloudbleed. The code for the HTML parser seems to have originated from Brian Pane's open source [Jitify](https://github.com/brianpane/jitify-core) (see the copyright info below) which we found while researching parsers written in Ragel. <img style=" margin: 1em; border-radius: 2px; border: 1px solid #CCC;" src="/img/copyright_jitify.png"> <img style=" margin: 1em; border-radius: 2px; border: 1px solid #CCC;" src="/img/JFP.png"> This means the code base for the parser is over 7 years old. Rigorous code review of older code may have helped prevent Cloudflare from triggering this bug while moving away from the Ragel parser to their new one.
+* More rigorous testing of legacy code may have helped prevent Cloudbleed. The code for the HTML parser seems to have originated from Brian Pane's open source [Jitify](https://github.com/brianpane/jitify-core) (see the copyright info below) which we found while researching parsers written in Ragel. <img style=" margin: 1em; border-radius: 2px; border: 1px solid #CCC;" src="https://raw.githubusercontent.com/asamborski/cs558_s17_blog/master/img/copyright_jitify.png"> <img style=" margin: 1em; border-radius: 2px; border: 1px solid #CCC;" src="https://raw.githubusercontent.com/asamborski/cs558_s17_blog/master/img/JFP.png"> This means the code base for the parser is over 7 years old. Rigorous code review of older code may have helped prevent Cloudflare from triggering this bug while moving away from the Ragel parser to their new one.
 
 ### Cloudflare was the Single point of Failure
 So what happened to all the modern security standards we learned in class and why didn’t they prevent or mitigate this bug? TLS/SSL wasn't compromised or misused, authentication methods were behaving properly; why didn't these help? The bug was caused by poorly written code on Cloudflare’s server itself, and this code resulted in data being leaked into HTML pages. So the pages were encrypted and authorized as usual, but contained data that wasn't supposed to be there. This, combined with search engine caches making the data more accessible, made security frameworks in place irrelevant.
