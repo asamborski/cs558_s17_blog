@@ -49,7 +49,7 @@ if ( ++p == pe )
 ```
 Here, `p` is a pointer to the current character in the buffer and `pe` is a pointer to the character after the buffer. This is a classic buffer overrun problem in C. The `==` should really be `>=` because if `p` gets incremented past the value of `pe` the `_test_eof` function will not be called and instead whatever is in memory after the buffer will be referenced by `p`. This makes it clearer how private server memory was leaked into Cloudflare HTML responses.
 
-### What's It Look Like?
+### What Did It Look Like?
 That is how the bug works, but how did leaked data actually look in the browser? This is an example:
 
  ![img-name](http://docs.ismgcorp.com/files/images_articles/cloudbleed-example-march2017.jpg)
@@ -57,28 +57,29 @@ That is how the bug works, but how did leaked data actually look in the browser?
 As we can see the bug directly injected data into the html file. Whatever is present in memory at the time the bug is triggered would be leaked, sometimes **sensitive** data, in plaintext.
 
 ### Search Engine Caching
-This problem was made worse by the fact that search engines had cached these pages that included leaked data. This made the leaked information more easily accessible- to find data leaked by Cloudbleed, one could simply search for Cloudflare headers and get back relevant search results.
+The problem was made worse by the fact that search engines had cached these pages that included leaked data. This made the leaked information more easily accessible- to find data leaked by Cloudbleed, one could simply search for Cloudflare headers and get back relevant search results.
 
 Here is an example of Uber data that you could search for using google. You only need to search with the Cloudflare header followed by the company name.
 
-![img-name](../img/googlesearch.png)
-![img-name](../img/UberData.png)
+![img-name](/img/googlesearch.png)
+![img-name](/img/UberData.png)
 
 In the image above we can see the potential data leaks from Uber including a specific user’s cookie, geolocation, and an auth token. The Uber auth token and cookie are particurlary sensitive because they could potentially be used to highjack a user's session.
 
 The search results were quickly scrubbed by Google, Duck Duck Go and other major search engines after the initial discovery. This was done to prevent exposure of sensitive information.
 
 ## Prevention and Takeaways
+How could this bug and leak have been prevented? What can we learn from this ordeal?
 
-###### Cloudflare was the Single point of Failure
-
-So what happened to all the modern security standards we learned in class and why didn’t they protect our privacy? None of the Security standards including TLS/SSL were compromised or misused, No Encryption scheme was broken. The bug was caused by poorly written code on Cloudflare’s server itself and it was leaking raw sensitive memory data into html pages. This situation was made worse because Google and other search engines cached that data that allowed the data to be easily searched.
-
-* Tagged Memory - Companies could use tag memory so it becomes harder to actually access the memory if an overflow like this happened.
-
+### How Could This Have Been Prevented?
 * Sand Box their servers - would prevent this since accessing a site with malformed html will only give you access of that's site data and not other sites, making the impact minimal since a few sites using Cloudflare actually have this problem.
 
+* Tagged Memory - while modern web security has come a long way, there's an argument to be made that we are ultimately putting band aids on legacy systems that weren't designed to be secure. Companies could invest more in making underlying technologies more secure. In the case of Cloudbleed, perhaps a tagged memory architecture that restricts access to server memory more robustly could have mitigated the buffer overrun and consequently, the leak.
+
 * Evaluate legacy code thoroughly **AUSTIN**
+
+### Cloudflare was the Single point of Failure
+So what happened to all the modern security standards we learned in class and why didn’t they prevent or mitigate this bug? TLS/SSL wasn't compromised or misused, authentication methods were behaving properly; why didn't these help? The bug was caused by poorly written code on Cloudflare’s server itself, and this code resulted in data being leaked into HTML pages. So the pages were encrypted and authorized as usual, but contained data that wasn't supposed to be there. This, combined with search engine caches making the data more accessible, made security frameworks in place irrelevant.
 
 ## Legal and Ethical Issues
 
