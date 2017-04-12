@@ -13,28 +13,32 @@ Cloudflare is a company that provides a CDN, DNS, and security services for cust
 ## Media Coverage
 
 ## The Bug
-##### Results
-That is how the bug works, but how did look on the browser? This is an example of how it looked like …. As we can see the bug directly injected sensitive data into the html file.
+##### Effects of the Bug
+That is how the bug works, but how did it look on the browser? This is an example of how it looked like:
 
+ ![img-name](http://docs.ismgcorp.com/files/images_articles/cloudbleed-example-march2017.jpg)
 
+As we can see the bug directly injected data into the html file. Sometimes it injected **sensitive** data in plaintext into the website.
 
-Here is an example of Uber data that you could search for using google. You only need to search with the Cloudflare header followed by the company name. Here we can see the potential data leaks from uber including a specific user’s cookie, exact geolocation and the uber auth token.
+Here is an example of Uber data that you could search for using google. You only need to search with the Cloudflare header followed by the company name.
 
 ![img-name](../img/googlesearch.png)
 ![img-name](../img/UberData.png)
 
-The Search Results where quickly scrubbed by Google, Duck Duck Go and other major search engines after the initial discovery. This was done to prevent exposure to sensitive information.
+On the Image above we can see the potential data leaks from Uber including a specific user’s cookie, exact geolocation and the Uber auth token. The Uber auth token and cookie is particurlary sensitive because it can be used to steal a User's session.
+
+The Search Results where quickly scrubbed by Google, Duck Duck Go and other major search engines after the initial discovery. This was done to prevent exposure of sensitive information.
 
 
 ## Prevention and Takeaways
 
-All of this problem happened because Cloudflare was the Single point of Failure.
+###### Cloudflare was the Single point of Failure
 
 So what happened to all the modern security standards we learned in class and why didn’t they protect our privacy? None of the Security standards including TLS/SSL were compromised or misused, No Encryption scheme was broken. The bug was caused by poorly written code on Cloudflare’s server itself and it was leaking raw sensitive memory data into html pages. This situation was made worse because Google and other search engines cached that data that allowed the data to be easily searched.
 
-* Tagged Memory - Companies could use tag memory so it becomes harder to actually access the memory if an overflow like this happened
+* Tagged Memory - Companies could use tag memory so it becomes harder to actually access the memory if an overflow like this happened.
 
-* Sand Box Their servers - would prevent this since accessing a site with malformed html will only give you access of that's site data and not other sites, making the impact minimal since a few sites using cloudflare actually have this problem
+* Sand Box their servers - would prevent this since accessing a site with malformed html will only give you access of that's site data and not other sites, making the impact minimal since a few sites using Cloudflare actually have this problem.
 
 * Evaluate legacy code thoroughly **AUSTIN**
 
