@@ -1,0 +1,127 @@
+---
+layout: post
+title: The Duqu2.0 Attack on Kaspersky Lab
+author: Li Liu, Yingqiao Xiong, Bohan Li 
+---
+
+# Abstract
+
+Duqu 2.0, first discovered by the Kaspersky Lab during a security sweep, was widely reported by the mainstream media in 2015. It is believed to be one of the most sophisticated and dangerous malware platforms. Duqu 2.0 was named after the infamous 2011 Duqu malware. It is essentially a type of new malware shared some similarities with the old Duqu, and yet is more advanced in so many ways.
+
+Since there are so many variations of the Duqu 2.0 attack, and the attackers seemed to be patient enough to “customize” the code for each attack, this report will mainly focus on the attack that performed by Duqu 2.0 on the internal systems of the Kaspersky company.The exact reason why Kaspersky Lab was targeted is not clear. The potential intention might be acquiring information on Kaspersky Lab’s newest defensive technologies.
+
+# Initial Attack
+
+The original infection vector for Duqu 2.0 stays unknown for now because the suspected initially infected computer’s mailbox and browser history was completely wiped out almost at the same time is identified.
+
+However, the Kaspersky analyzing team expected it was a spear-phishing email sent to a non-technical employee of the Kaspersky company that when clicked would lead to a website that contains an exploit to the zero-day CVE-2014-4148, named TrueType Font Parsing Remote Code Execution Vulnerability. The zero-day can be exploited because the Windows kernel-mode driver fails to properly handle the TrueType font. When it is successfully exploited, according to Microsoft, attackers who successfully exploited this vulnerability could take complete control of the affected system. They could then install programs; view, change, or delete data; or create new accounts with full user rights.
+
+# Lateral Movement
+
+Once the attackers have seized control of the particular computer, the problem arises because it is a node on the Kaspersky LAN, which means the attackers can then deploy other techniques to further affect other computers on the network. According to the Kaspersky analysis team, Duqu 2.0 seemed to take advantage of another zero-day, CVE-2014-6324, named Kerberos Checksum Vulnerability. When this zero-day is successfully exploited, the attackers can elevate an unprivileged domain user account to a domain administrator account, and by impersonating the domain administrator, they could install programs; view, change or delete data.
+
+From this point, the attackers pushed backdoor programs all over the internet, and using them to deploy the so-called Duqu 2.0 MSI, which can be used to establish a fully featured, C&C-capable, in memory espionage platform.
+
+# Duqu2.0 MSI
+
+The Duqu 2.0 is a very complicated attack, but the MSI packages that spread around the LAN of Kaspersky shared some characteristics on basic structure. The structures can be roughly split into two layers, and in which the second layer can be further divided into three sublayers:
+1. The Custom Action Layer and
+2. The Custom Action Data Layer
+a. Helper Structure
+b. Klif.dll
+c. Pluginnable modules
+
+## First Layer - Custom Action DLL (msi.dll)
+
+The execution is immediately passed to this layer once the OS opened the MSI file. Since all the data stored in the second layer is compressed and encrypted, this layer’s main purpose is to retrieve the PROP key from the command line and then decrypt the payload ActionData0. This layer then exports one single function called StartAction(), and when it is running, the execution is passed to the shell code, in which all the actions take place in Second Layer.
+
+## Second Layer - Custom Action Data (ActionData0)
+
+This layer is the main payload of the MSI package, and we will talk about each of the three sublayers individually:
+➢ Helper Structure: When execution is passed to this part, the shell code it runs will find some essential System API that will be used later in the attack, and then decompress the payload. After that, it will also extract BLOBs of Portable Executable file (PE) and some more embedded payload, and get some pointers to the internal data. Finally, the helper structure is established, then the execution is passed to the second sublayer called klif.dll
+➢ Klif.dll (KLIF stands for Kaspersky Lab Intruder Filter): This is another executable file.
+![image](https://68.media.tumblr.com/ea3d9b90b79b372e73bd505078213888/tumblr_inline_onx1y4LPiz1t282pk_540.png)
+
+  Klif.dll, as the name may suggest, is designed to attack the filter driver in legitimate Kaspersky product. However, since the filter driver is fairly well-protected, the klif.dll utilized several mechanics through multiple steps to achieve this goal.
+  ○ First, it will scan the computer’s running process and check if the “avp.exe” is running. The AVP here stands for AntiVirus Project, which is the process name for the legitimate Kaspersky product.
+  ○ If “avp.exe” is running, then it will locate the actual path of the process. After obtaining the file path, it will then allocate a new section of memory and map that to “avp.exe” as file view. A file view, in short, is the portion of virtual address space that a process uses to access the file’s content.
+  ○ So after doing it, the klif.dll will start a new thread, let’s call it thread T, in the section, and perform some regular calls here. So far from the outside, it looks like the new thread begins with a call originating from the avp.exe module and does some benign function calls, and it will trick the actual avp.exe to trust the call stack of this thread will cause no harm.
+￼
+  ○ However, at this point, the Thread T still cannot tamper with the klif.sys because, in order to modify the driver, the Kaspersky product requires a caller digital signature check. Since the Thread T does not have the signature for sure, Duqu 2.0 introduces two more dll to bypass the check, CTwoPENC.dll and KMART.dll. The CTwoPENC.dll exploits yet another zero-day CVE-2015-2360, titled as Win32k Elevation of Privilege Vulnerability. By attacking this vulnerability, it will enable the attackers to enter the kernel mode of the computer, in which the attackers have exclusive access to anything. Then, with the KMART.dll, the caller digital signature check is then disabled. With all the obstacles gone, the Thread T then proceeds to send driver communication to klif.sys, making all the other plugin modules processes to be invisible to the filter. And this concludes the second sublayer called klif.dll.
+➢ Pluginnable modules: Since the klif.dll has taken care of the filter, the plugin modules can be a bit more relaxed and broad. In fact, Kaspersky has found more than 100 types of the pluginnable modules, and most of them are coded in the language of assembly. We will pick a few of them and describe briefly in the Pluginnable Modules section.
+
+# Pluginnable Modules
+
+Since there are some many variants of the plugin modules used by Duqu 2.0, the Kaspersky analysis team used a virtual identifier based on the two bytes of their MD5 sum to represent each of the plugins.
+
+## 03B7
+
+This module implements multiple protocol handlers for C&C communication. It also starts the plugin framework, loads and manages all additional plugins. So it is basically a master plugin that controls all other plugins. This Interaction via HTTP is concealed in JPEG or GIF files.
+
+## 4160
+
+Basically, this plugin steals usernames and passwords in Chrome login data. It first opens up the Chrome login data. Then it perform a SQL command to get the username and passwords
+![image](https://68.media.tumblr.com/fc95e2100b216720e2aa15d86d7c0d7a/tumblr_inline_onx1wmoBqx1t282pk_540.png)
+
+## 7C23
+
+This plugin extracts many different data from infected systems. Data like Email, image, multimedia files like mp4 AVI, PDF documents , Microsoft office, archives. With the help of this plugin, the attackers can access any data they want.
+
+# Survival Mechanism
+
+## Persistence Mechanism
+
+Unlike many other malware platforms, Duqu 2.0 did not implement any particular persistence mechanism to ensure long-term exploit. Instead, it actually applies a method that assures high-speed regeneration. The attackers first infect servers that have high uptime and use them as sub-C&C points to efficiently infect other machines that are in the domain. Also, the infected servers will re-infect any machine is disinfected due to reboots. This mechanism makes it very difficult for victims to detect and remove the malware.
+
+Another remarkable feature about Duqu 2.0 is that the malware lives almost exclusively in memory while running kernel level code. Kaspersky Lab states that this is an unseen breakthrough technique: modern anti-APT technologies mainly detect anomalies in the disk and ignore threats in memory. However, this mechanism also has a weakness. If all machines in the same domain reboot at the same time due to accidents such as massive power loss, the malware will be erased entirely. To get rid of this weakness, the attackers will install a few file drivers to some of the machines that they have access to. In this way, the attackers will be able to tunnel traffic from the outside and remotely deploy the malware again by previously acquired credentials.
+
+## Command and Control mechanism
+
+Duqu 2.0 develops a complicated and flexible C&C mechanism, making use of both internal and external traffic. If the new infected machines do not has a built-in C&C in the MSI, the malware firstly remains dormant status before being activated by a magic string, which will be transmitted in by attackers through a TCP/IP package. Otherwise, an IP address hardcoded in the MSI will serve as the sub-C&C point. To hide the traffic, all communications are encrypted and masked as image files (JPEG or GIF).
+
+Another unusual mechanism is that Duqu 2.0 deploys some driver files on infected servers that have direct Internet connections to tunnel traffics into the network, so that infected machines can jump over C&C points and the attackers will be able to access servers inside the LAN. For example, Kaspersky lab found a NDIS(Network Driver Interface Specification) filter driver called “portserv.sys”, which is designed to perform manipulation of TCP/IP packets.
+
+![image](https://68.media.tumblr.com/44065dcb079a4258c1075bba3711c0ac/tumblr_inline_onx1wy9dRX1t282pk_540.png)
+
+Initially, the filter driver gets into the NDIS stack, starts processing TCP/IP packets and waits for the package that contains the magic string. Then the attackers send a TCP/IP package that codes in the magic string “romanian.antihacker ” to any IPs that belongs to infected servers. Outside of the LAN, traffics will be masked over port 443(SSL traffic)
+
+![image](https://68.media.tumblr.com/50d7d159d56a1e296ac35ef5adfe47f4/tumblr_inline_onx1x5ygYr1t282pk_540.png)
+
+Routine:
+➢ The “portserv.sys” driver will see the package. Once it identifies the magic string, it will save the IP address of the attackers.
+➢ Any package that is received from the attackers IPs will then be redirected between two ports (Port 443 and another port) consecutively so that the external traffic is established.
+➢ Inside the LAN, RDP (Remote Desktop Protocol)/SMB (Server Message Block) protocols will be used for communications.
+
+In addition, such mechanism also guarantees that attackers will be able to re-gain access even if all machines in the LAN reboot as long as the driver still works.
+
+# Conclusion
+
+## Who is the attacker?
+
+So far the attacker is still unknown. Kaspersky Lab believes that Duqu 2.0 is a nation supported program and the cost of developing and maintaining such a platform is around $50 million. It is also said that the former version of Duqu 2.0, Duqu, is identical to another malware called Stuxnet, which is believed to be oriented by NSA and CIA.
+
+## About the victims
+
+It is discovered that Kaspersky wasn’t the only target of this powerful threat actor. Other victims have been found in Western, Middle-Eastern and Asian countries. Most notably, Duqu 2.0 attacked some hotels in Austria and Switzerland, which are the sites of international negotiations with Iran over its nuclear program and economic sanctions. The threat actor also launched a similar attack in relation to the 70th-anniversary event of the liberation of Auschwitz-Birkenau.” There are also other victims reported, such as banks and many other organizations.
+
+## How to prevent?
+
+It is really hard to prevent this kind of attack due to Duqu 2.0’s survival mechanism. The only advice we could give is to patch the system to avoid known vulnerabilities. To detect activities of the malware, it is also necessary to take snapshots of the memory. However, this does not guarantee safety. What is really remarkable about Duqu 2.0 is that the entire malware platform was based on zero-days. If there is no zero-day that helps to jump into kernel mode, the malware won’t work. This may imply that the attackers were extremely confident that even if the zero-day is patched, they could still implement another one. Otherwise, they wouldn’t have built a platform dependent entirely on zero-days.
+We have enough reasons to believe that the attackers have more unknown zero-day vulnerabilities that they can deploy.
+
+#Acknowledgment
+
+Thanks to Ann Ming Samborski for all the feedbacks. This work is done without any other outside collaboration.
+
+#References
+
+- http://resources.infosecinstitute.com/duqu-2-0-the-most-sophisticated-malware-ever-seen /#gref
+- https://securelist.com/blog/research/70504/the-mystery-of-duqu-2-0-a-sophisticated-cybe respionage-actor-returns/
+- http://pure.qub.ac.uk/portal/files/33499201/ICISSP_2016_81.pdf
+- https://www.wired.com/2015/06/kaspersky-finds-new-nation-state-attack-network/
+- http://go.kaspersky.com/rs/802-IJN-240/images/Kaspersky%20presentation%20Nicolas%20Brulez.pdf
+- http://media.kaspersky.com/en/Duqu-2-0-Frequently-Asked-Questions.pdf
+￼￼￼￼￼￼￼- https://en.wikipedia.org/wiki/Duqu_2.0
+- https://en.wikipedia.org/wiki/Duqu
+- https://technet.microsoft.com/library/security/ms14-068#ID0E5GAE
+- http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=cve-2015-2360
