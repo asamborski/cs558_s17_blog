@@ -12,17 +12,17 @@ On March 26, 2015, Github was attacked by large scale DDoS attack. A report rele
 On March 16th, 2015, GreatFire.org’s servers were under DDoS attack. Ten days later, GreatFire Github page and cn-nytimes Github page was under the similar attack, which causes Github.com down for 120 hours. This attack is the largest DDoS in site’s history, and is aiming to remove or delete these two web pages.
 
 # Overview
-![alt text]({{ site.url }}/img/GC_Overview.png "Overview")
+![alt text](https://raw.githubusercontent.com/asamborski/cs558_s17_blog/master/img/GC_Overview.png "Overview")
 
 # Great Firewall
 Great Firewall is an on-path system, unlike other in-path firewall. It eavesdrops on traffic between China and the rest of the world, and terminate requests for banned content, by injecting a series forged TCP Reset packets that tell both the requester and the destination to stop communicating. GFW keeps track of connections and reassembles the packets to determine if it should block traffic. GFW is a barrier, not an attacking tool. As an on-path system, the GFW can monitor traffic and inject additional packets, but cannot stop in-flight packets from reaching its destination.
-![alt text]({{ site.url }}/img/GF.png "Great Firewall Traffic Flow")
+![alt text]({{ site.url }}/img/https://raw.githubusercontent.com/asamborski/cs558_s17_blog/master/img/GF.png "Great Firewall Traffic Flow")
 
 As the diagram shows above, if Alice inside of GFW intends to talk to Bob in global Internet, when TCP packets reach GFW, GFW will forge TCP reset packets and inject into Alice’s TCP request. In such way, Alice and Bob could not communicate.
 
 # Great Canon
 
-![alt text]({{ site.url }}/img/GC.png "Great Cannon")
+![alt text](https://raw.githubusercontent.com/asamborski/cs558_s17_blog/master/img/GC.png "Great Cannon")
 
 The GC operates as a separate, in-path system
 The institution observed Baidu responding as normal to the retransmitted request. And by this they conclude that the GC dropped the request before it reached Baidu, a capability not present in the GFW.
