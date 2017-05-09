@@ -16,7 +16,7 @@ On March 16th, 2015, GreatFire.org’s servers were under DDoS attack. Ten days 
 
 # Great Firewall
 Great Firewall is an on-path system, unlike other in-path firewall. It eavesdrops on traffic between China and the rest of the world, and terminate requests for banned content, by injecting a series forged TCP Reset packets that tell both the requester and the destination to stop communicating. GFW keeps track of connections and reassembles the packets to determine if it should block traffic. GFW is a barrier, not an attacking tool. As an on-path system, the GFW can monitor traffic and inject additional packets, but cannot stop in-flight packets from reaching its destination.
-![alt text]({{ site.url }}/img/https://raw.githubusercontent.com/asamborski/cs558_s17_blog/master/img/GF.png "Great Firewall Traffic Flow")
+![alt text](https://raw.githubusercontent.com/asamborski/cs558_s17_blog/master/img/GF.png "Great Firewall Traffic Flow")
 
 As the diagram shows above, if Alice inside of GFW intends to talk to Bob in global Internet, when TCP packets reach GFW, GFW will forge TCP reset packets and inject into Alice’s TCP request. In such way, Alice and Bob could not communicate.
 
